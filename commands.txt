@@ -1,0 +1,5 @@
+config system console
+set output standard
+end
+show firewall vip
+exit

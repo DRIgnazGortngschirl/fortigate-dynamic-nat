@@ -1,5 +1,9 @@
 #/bin/bash
 
+# If running a systemd service
+# INSTALLPATH=$(egrep -v "^\s*(#|$)" config.txt | grep INSTALLPATH | sed 's/INSTALLPATH=//g' | tr -d '\r')   
+# cd $INSTALLPATH
+
 PARAMETER=$1                                                                                                                                                                    # Get parameter
 
 if [ "$PARAMETER" = "-h" ]; then                                                                                                                                                # Check for -h parameter

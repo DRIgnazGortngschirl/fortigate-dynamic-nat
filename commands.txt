@@ -3,3 +3,4 @@ set output standard
 end
 show firewall vip
 exit
+

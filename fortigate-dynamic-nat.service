@@ -1,0 +1,13 @@
+[Unit]
+Description=fortigate-dynamic-nat https://github.com/MrMarioMichel/fortigate-dynamic-nat
+After=syslog.target network.target
+
+[Service]
+User=<USER>
+
+Type=simple
+ExecStart=/bin/bash <INSTALLPATH>/fortigate-dynamic-nat.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

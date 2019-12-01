@@ -1,0 +1,20 @@
+# DOMAIN will be the checked address
+DOMAIN=mariomichel.com
+
+# DNS will be the used DNS Serve to lookup the address
+DNS=1.1.1.1
+
+# SLEEPBETWEENCHEKS will be the wait time in secounds if the IP has changed
+SLEEPBETWEENCHEKS=900
+
+# FORTIGATEIP will be the used FortiGate to configure the VIP/NAT external to internal
+FORTIGATEIP=<IP>
+
+# FORTIGATEUSER will be the used user to access the FortiGate
+FORTIGATEUSER=<USER>
+
+# FORTIGATEPASSWD will be the passwort for the user
+FORTIGATEPASSWD=<PASSWORD>
+
+# FORTIGATESSHPORT will be the used to access via SSH
+FORTIGATESSHPORT=22

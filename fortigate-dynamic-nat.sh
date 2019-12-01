@@ -45,6 +45,7 @@ while true; do                                                                  
         if [ "$PARAMETER" = "-t" ]; then                                                                                                                                        # Check for -t parameter
             echo "[i]: TESTMODE will not push config"                                                                                                                           # Print output
             cat config-now.txt                                                                                                                                                  # Display config
+            rm config-now.txt
             exit                                                                                                                                                                # Exit
         fi                                                                                                                                                                      # End of Check for -t parameter
         echo "exit" >>config-now.txt                                                                                                                                            # Exit the SSH session

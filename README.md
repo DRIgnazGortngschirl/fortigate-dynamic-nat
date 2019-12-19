@@ -1,3 +1,5 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d287c9c868e649e6a753224aeea9c3c1)](https://www.codacy.com/manual/MrMarioMichel/fortigate-dynamic-nat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MrMarioMichel/fortigate-dynamic-nat&amp;utm_campaign=Badge_Grade)
+
 # Fortigate Dynamic Nat
 This scrip can automatically update a VIP address from public/external to local/internal
 

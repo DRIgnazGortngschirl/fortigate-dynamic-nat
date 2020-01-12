@@ -14,10 +14,12 @@ Basically it's a watcher and waits a defined time till the IP address gets check
 
 ### Output if you use -tf -d  (see notes for infos) 
 ![alt text](https://pics.mariomichel.com/9drukz.png)
+
 *Note : The script has been run in the force and test mode ( -ft ) Therefor is a line with the note that the script was executed with an additional parameter. "FORCEMODE" and "TESTMODE"
 
 ### Output the IP changes (see notes for infos) 
 ![alt text](https://pics.mariomichel.com/vridnd.png)
+
 *Note : The script has been run in the force mode ( -f ) Therefor is a line with the note that the script was executed with an additional parameter. "FORCEMODE"
 
 ## Logging

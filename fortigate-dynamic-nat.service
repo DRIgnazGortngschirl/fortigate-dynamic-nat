@@ -1,6 +1,6 @@
 [Unit]
 Description=fortigate-dynamic-nat https://github.com/MrMarioMichel/fortigate-dynamic-nat
-After=syslog.target network.target
+After=network.target
 
 [Service]
 User=<USER>

@@ -30,29 +30,69 @@ FORTIGATESSHPORT=$(egrep -v "^\s*(#|$)" config.txt | grep FORTIGATESSHPORT | sed
 FORTIGATEUSER=$(egrep -v "^\s*(#|$)" config.txt | grep FORTIGATEUSER | sed 's/FORTIGATEUSER=//g' | tr -d '\r')          # Get settings from config file
 FORTIGATEPASSWD=$(egrep -v "^\s*(#|$)" config.txt | grep FORTIGATEPASSWD | sed 's/FORTIGATEPASSWD=//g' | tr -d '\r')    # Get settings from config file
 
-while true; do                                                                                                                                                    # Main loop
-    if [ "$PARAMETER1" = "-d" ] || [ "$PARAMETER2" = "-d" ]; then                                                                                                 # Check for -d parameter
-        DOMAIN=$(egrep -v "^\s*(#|$)" config.txt | grep DOMAIN | sed 's/DOMAIN=//g' | tr -d '\r')                                                                 # Gets settings from config file
-        DNS=$(egrep -v "^\s*(#|$)" config.txt | grep DNS | sed 's/DNS=//g' | tr -d '\r')                                                                          # Gets settings from config file
-        SLEEPBETWEENCHEKS=$(egrep -v "^\s*(#|$)" config.txt | grep SLEEPBETWEENCHEKS | sed 's/SLEEPBETWEENCHEKS=//g' | tr -d '\r')                                # Gets settings from config file
-        IPPRE=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}')                                                                          # Check the current Public IP of DOMAIN
-        echo -e "[i]: Current Public IP for \e[34m$DOMAIN\e[39m is \e[35m$IPPRE\e[39m"                                                                            # Print output
-        sleep "$SLEEPBETWEENCHEKS"                                                                                                                                # Wait till next check if the IP changed
-        IPNOW=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}')                                                                          # Check the current Public IP of DOMAIN to see if it has changed
-        MINS=$(echo "$SLEEPBETWEENCHEKS" 60 | awk '{print $1 / $2}')                                                                                              # Calculate wait time in minutes
-        echo -e "[i]: Current Public IP for \e[34m$DOMAIN\e[39m after \e[33m$SLEEPBETWEENCHEKS\e[39m seconds (\e[33m$MINS\e[39m minutes) is \e[35m$IPPRE\e[39m"   # Print output
-    else                                                                                                                                                          # Default check hosts Public IP o see if it has changed
-        SLEEPBETWEENCHEKS=$(egrep -v "^\s*(#|$)" config.txt | grep SLEEPBETWEENCHEKS | sed 's/SLEEPBETWEENCHEKS=//g' | tr -d '\r')                                # Gets settings from config file
-        IPPRE=$(dig +short myip.opendns.com @resolver1.opendns.com)                                                                                               # Check the current Public IP of host itself
-        echo -e "[i]: Current Public IP for \e[34m$HOSTNAME\e[39m is \e[35m$IPPRE\e[39m"                                                                          # Print output
-        sleep "$SLEEPBETWEENCHEKS"                                                                                                                                # Wait till next check if the IP changed
-        IPNOW=$(dig +short myip.opendns.com @resolver1.opendns.com)                                                                                               # Check the current Public IP of host itself to see if it has changed
-        MINS=$(echo "$SLEEPBETWEENCHEKS" 60 | awk '{print $1 / $2}')                                                                                              # Calculate wait time in minutes
-        echo -e "[i]: Current Public IP for \e[34m$HOSTNAME\e[39m after \e[33m$SLEEPBETWEENCHEKS\e[39m seconds (\e[33m$MINS\e[39m minutes) is \e[35m$IPPRE\e[39m" # Print output
-    fi                                                                                                                                                            # End of Check for -d parameter
-    if [ "$PARAMETER1" = "-f" ]; then                                                                                                                             # Check for -f parameter
-        IPNOWTEMP="$IPNOW"                                                                                                                                        # Remember IP for later
-        IPNOW=0.0.0.0                                                                                                                                             # Set IP to 0.0.0.0 to trigger a config update for the VIPs
+while true; do                                                                                                                     # Main loop
+    if [ "$PARAMETER1" = "-d" ] || [ "$PARAMETER2" = "-d" ]; then                                                                  # Check for -d parameter
+        DOMAIN=$(egrep -v "^\s*(#|$)" config.txt | grep DOMAIN | sed 's/DOMAIN=//g' | tr -d '\r')                                  # Gets settings from config file
+        DNS=$(egrep -v "^\s*(#|$)" config.txt | grep DNS | sed 's/DNS=//g' | tr -d '\r')                                           # Gets settings from config file
+        SLEEPBETWEENCHEKS=$(egrep -v "^\s*(#|$)" config.txt | grep SLEEPBETWEENCHEKS | sed 's/SLEEPBETWEENCHEKS=//g' | tr -d '\r') # Gets settings from config file
+        IPPRE=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}')                                           # Check the current Public IP of DOMAIN
+        if [ "$IPPRE" = ";; connection timed out; no servers could be reached" ]; then
+            NOIP=1
+            while [ "$NOIP" -eq 1 ]; do
+                IPPRE=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}')
+                if ! [ "$IPPRE" = ";; connection timed out; no servers could be reached" ]; then
+                    NOIP=0
+                fi
+            done
+        else
+            echo -e "[i]: Current Public IP for \e[34m$DOMAIN\e[39m is \e[35m$IPPRE\e[39m" # Print output
+        fi
+        sleep "$SLEEPBETWEENCHEKS"                                                       # Wait till next check if the IP changed
+        IPNOW=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}') # Check the current Public IP of DOMAIN to see if it has changed
+        if [ "$IPNOW" = ";; connection timed out; no servers could be reached" ]; then
+            NOIP=1
+            while [ "$NOIP" -eq 1 ]; do
+                IPNOW=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}')
+                if ! [ "$IPNOW" = ";; connection timed out; no servers could be reached" ]; then
+                    NOIP=0
+                fi
+            done
+        else
+            MINS=$(echo "$SLEEPBETWEENCHEKS" 60 | awk '{print $1 / $2}')                                                                                            # Calculate wait time in minutes
+            echo -e "[i]: Current Public IP for \e[34m$DOMAIN\e[39m after \e[33m$SLEEPBETWEENCHEKS\e[39m seconds (\e[33m$MINS\e[39m minutes) is \e[35m$IPPRE\e[39m" # Print output
+        fi
+    else                                                                                                                           # Default check hosts Public IP o see if it has changed
+        SLEEPBETWEENCHEKS=$(egrep -v "^\s*(#|$)" config.txt | grep SLEEPBETWEENCHEKS | sed 's/SLEEPBETWEENCHEKS=//g' | tr -d '\r') # Gets settings from config file
+        IPPRE=$(dig +short myip.opendns.com @resolver1.opendns.com)                                                                # Check the current Public IP of host itself
+        if [ "$IPPRE" = ";; connection timed out; no servers could be reached" ]; then
+            NOIP=1
+            while [ "$NOIP" -eq 1 ]; do
+                IPPRE=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}')
+                if ! [ "$IPPRE" = ";; connection timed out; no servers could be reached" ]; then
+                    NOIP=0
+                fi
+            done
+        else
+            echo -e "[i]: Current Public IP for \e[34m$HOSTNAME\e[39m is \e[35m$IPPRE\e[39m" # Print output
+        fi
+        sleep "$SLEEPBETWEENCHEKS"                                  # Wait till next check if the IP changed
+        IPNOW=$(dig +short myip.opendns.com @resolver1.opendns.com) # Check the current Public IP of host itself to see if it has changed
+        if [ "$IPNOW" = ";; connection timed out; no servers could be reached" ]; then
+            NOIP=1
+            while [ "$NOIP" -eq 1 ]; do
+                IPNOW=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}')
+                if ! [ "$IPNOW" = ";; connection timed out; no servers could be reached" ]; then
+                    NOIP=0
+                fi
+            done
+        else
+            MINS=$(echo "$SLEEPBETWEENCHEKS" 60 | awk '{print $1 / $2}')                                                                                              # Calculate wait time in minutes
+            echo -e "[i]: Current Public IP for \e[34m$HOSTNAME\e[39m after \e[33m$SLEEPBETWEENCHEKS\e[39m seconds (\e[33m$MINS\e[39m minutes) is \e[35m$IPPRE\e[39m" # Print output
+        fi
+    fi                                # End of Check for -d parameter
+    if [ "$PARAMETER1" = "-f" ]; then # Check for -f parameter
+        IPNOWTEMP="$IPNOW"            # Remember IP for later
+        IPNOW=0.0.0.0                 # Set IP to 0.0.0.0 to trigger a config update for the VIPs
     else
         if [ "$PARAMETER1" = "-tf" ]; then # Check for -tf parameter
             IPNOWTEMP="$IPNOW"             # Remember IP for later

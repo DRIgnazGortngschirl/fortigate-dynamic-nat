@@ -14,6 +14,7 @@ Basically it's a watcher and waits a defined time till the IP address gets check
 ### Output of the script
 
 local resolve
+
 ![](https://raw.githubusercontent.com/MrMarioMichel/fortigate-dynamic-nat/master/img/Annotation%202020-07-21%20000944.png)
 
 remote resolve

@@ -36,11 +36,11 @@ while true; do                                                                  
         DNS=$(egrep -v "^\s*(#|$)" config.txt | grep DNS | sed 's/DNS=//g' | tr -d '\r')                                           # Gets settings from config file
         SLEEPBETWEENCHEKS=$(egrep -v "^\s*(#|$)" config.txt | grep SLEEPBETWEENCHEKS | sed 's/SLEEPBETWEENCHEKS=//g' | tr -d '\r') # Gets settings from config file
         IPPRE=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}')                                           # Check the current Public IP of DOMAIN
-        if [ "$IPPRE" = ";; connection timed out; no servers could be reached" ]; then
+        if [ "$IPPRE" = ";; connection timed out; no servers could be reached" ] || [ -z "$IPNOW" ]; then
             NOIP=1
             while [ "$NOIP" -eq 1 ]; do
                 IPPRE=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}')
-                if ! [ "$IPPRE" = ";; connection timed out; no servers could be reached" ]; then
+                if ! [ "$IPPRE" = ";; connection timed out; no servers could be reached" ] || [ -z "$IPNOW" ]; then
                     NOIP=0
                 fi
             done
@@ -49,11 +49,11 @@ while true; do                                                                  
         fi
         sleep "$SLEEPBETWEENCHEKS"                                                       # Wait till next check if the IP changed
         IPNOW=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}') # Check the current Public IP of DOMAIN to see if it has changed
-        if [ "$IPNOW" = ";; connection timed out; no servers could be reached" ]; then
+        if [ "$IPNOW" = ";; connection timed out; no servers could be reached" ] || [ -z "$IPNOW" ]; then
             NOIP=1
             while [ "$NOIP" -eq 1 ]; do
                 IPNOW=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}')
-                if ! [ "$IPNOW" = ";; connection timed out; no servers could be reached" ]; then
+                if ! [ "$IPNOW" = ";; connection timed out; no servers could be reached" ] || [ -z "$IPNOW" ]; then
                     NOIP=0
                 fi
             done
@@ -64,11 +64,11 @@ while true; do                                                                  
     else                                                                                                                           # Default check hosts Public IP o see if it has changed
         SLEEPBETWEENCHEKS=$(egrep -v "^\s*(#|$)" config.txt | grep SLEEPBETWEENCHEKS | sed 's/SLEEPBETWEENCHEKS=//g' | tr -d '\r') # Gets settings from config file
         IPPRE=$(dig +short myip.opendns.com @resolver1.opendns.com)                                                                # Check the current Public IP of host itself
-        if [ "$IPPRE" = ";; connection timed out; no servers could be reached" ]; then
+        if [ "$IPPRE" = ";; connection timed out; no servers could be reached" ] || [ -z "$IPNOW" ]; then
             NOIP=1
             while [ "$NOIP" -eq 1 ]; do
-                IPPRE=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}')
-                if ! [ "$IPPRE" = ";; connection timed out; no servers could be reached" ]; then
+                IPPRE=$(dig +short myip.opendns.com @resolver1.opendns.com)
+                if ! [ "$IPPRE" = ";; connection timed out; no servers could be reached" ] || [ -z "$IPNOW" ]; then
                     NOIP=0
                 fi
             done
@@ -77,11 +77,11 @@ while true; do                                                                  
         fi
         sleep "$SLEEPBETWEENCHEKS"                                  # Wait till next check if the IP changed
         IPNOW=$(dig +short myip.opendns.com @resolver1.opendns.com) # Check the current Public IP of host itself to see if it has changed
-        if [ "$IPNOW" = ";; connection timed out; no servers could be reached" ]; then
+        if [ "$IPNOW" = ";; connection timed out; no servers could be reached" ] || [ -z "$IPNOW" ]; then
             NOIP=1
             while [ "$NOIP" -eq 1 ]; do
-                IPNOW=$(nslookup "$DOMAIN" "$DNS" | grep Address | tail -n 1 | awk '{print $2}')
-                if ! [ "$IPNOW" = ";; connection timed out; no servers could be reached" ]; then
+                IPNOW=$(dig +short myip.opendns.com @resolver1.opendns.com)
+                if ! [ "$IPNOW" = ";; connection timed out; no servers could be reached" ] || [ -z "$IPNOW" ]; then
                     NOIP=0
                 fi
             done
